@@ -1,11 +1,11 @@
 package main
 
 import (
+	"calc"
 	"log"
 	"net"
 	"net/http"
 	"net/rpc"
-	"../calc"
 )
 
 func main() {
@@ -27,7 +27,7 @@ func main() {
 	rpc.HandleHTTP()
 
 	/*
-		Inicializa um processo que escuta toda comunicacao em 
+		Inicializa um processo que escuta toda comunicacao em
 		determinada porta, seguindo o protocolo tcp
 	*/
 	listener, err := net.Listen("tcp", ":4040")
