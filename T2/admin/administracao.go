@@ -3,6 +3,7 @@ package admin
 import (
 	"fmt"
 	"log"
+	"time"
 )
 
 type Conta struct {
@@ -74,6 +75,11 @@ func (c *Conta) AbrirContaErro(conta Conta, reply *Conta) error {
 	}
 	log.Printf("Erro ao Abrir conta: Assinatura inválida %d\n", assinatura)
 	return fmt.Errorf("Assinatura inválida")
+}
+
+func (c *Conta) AbrirContaTimeout(conta Conta, reply *Conta) error {
+	time.Sleep(5 * time.Second)
+	return fmt.Errorf("Tempo limite expirado")
 }
 
 func (c *Conta) FecharConta(conta Conta, reply *Conta) error {

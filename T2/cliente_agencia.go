@@ -209,13 +209,19 @@ func simulaErroAbrirConta(c *rpc.Client, err error) {
 	}
 	conta.Assinatura = reply3
 	if conta.Assinatura != 0 {
-		err = c.Call("Conta.AbrirContaErro", conta, &reply)
+		err = c.Call("Conta.AbrirContaTimeout", conta, &reply)
 		if err != nil {
+			//time.Sleep(10 * time.Second)
 			log.Println("Erro na operação Abrir conta: ", err)
 			log.Println("Executando segunda tentativa")
-			err = c.Call("Conta.AbrirContaErro", conta, &reply)
+			err = c.Call("Conta.AbrirConta", conta, &reply)
 			if err != nil {
 				log.Println("Erro na operação Abrir conta: ", err)
+			} else {
+				fmt.Printf("Conta número: %d criada\n", reply.Numero)
+				fmt.Printf("Saldo da conta: %.2f\n", reply.Saldo)
+				fmt.Printf("Status da conta: %t\n", reply.Ativa)
+				reply.Saldo = 0
 			}
 		} else {
 			fmt.Printf("Conta número: %d criada\n", reply.Numero)
@@ -252,7 +258,7 @@ func simulaErroSacar(c *rpc.Client, err error) {
 					log.Fatal("Erro na operação Autenticar: ", err)
 				}
 				if reply2 == true {
-					err = c.Call("Conta.SacarErro", conta, &reply)
+					err = c.Call("Conta.Sacar", conta, &reply)
 					if err != nil {
 						log.Println("Erro na operação Sacar: ", err)
 					} else {
