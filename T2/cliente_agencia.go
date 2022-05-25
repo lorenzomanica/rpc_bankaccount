@@ -8,6 +8,13 @@ import (
 	"./admin"
 )
 
+var conta admin.Conta
+var assinatura int
+
+var reply admin.Conta
+var reply2 bool
+var reply3 int
+
 func main() {
 	/*
 	   Inicializa o cliente na porta 4040 do localhost
@@ -19,14 +26,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Error dialing: ", err)
 	}
-
-	//Variavel para receber os resultados
-	var reply admin.Conta
-	var reply3 int
-	var reply2 bool
-	var conta admin.Conta
-
-	var assinatura int
 
 	/*
 	   Call chama um metodo atrves da conexao estabelecida
@@ -40,29 +39,19 @@ func main() {
 	var op int = -1
 
 	for op != 0 {
-		fmt.Println("Digite a operação desejada:")
-		fmt.Println("1 - Abrir Conta")
-		fmt.Println("2 - Consultar Saldo")
-		fmt.Println("3 - Autenticar Conta")
-		fmt.Println("4 - Sacar")
-		fmt.Println("5 - Depositar")
-		fmt.Println("6 - Fechar Conta")
-		fmt.Println("7 - Abrir conta com erro (teste)")
-		fmt.Println("8 - Sacar com erro (teste)")
-		fmt.Println("9 - Depositar com erro (teste)")
-		fmt.Println("0 - Sair")
+		printMenu()
 		fmt.Scanln(&op)
 		assinatura = 0
 
 		switch op {
 		case 1:
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
+			err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
 			if err != nil {
 				log.Fatal("Conta error: ", err)
 			}
 			conta.Assinatura = reply3
 			if conta.Assinatura != 0 {
-				err = c.Call("Conta.Abrir_conta", conta, &reply)
+				err = c.Call("Conta.AbrirConta", conta, &reply)
 				if err != nil {
 					log.Fatal("Conta error: ", err)
 				}
@@ -82,12 +71,12 @@ func main() {
 				log.Fatal("Autenticar error: ", err)
 			}
 			if reply2 == true {
-				err = c.Call("Conta.Consultar_saldo", conta, &reply)
+				err = c.Call("Conta.ConsultarSaldo", conta, &reply)
 				fmt.Printf("Conta: %d\n", reply.Numero)
 				fmt.Printf("Saldo: %.2f\n", reply.Saldo)
 				reply.Saldo = 0
 				if err != nil {
-					log.Fatal("Consultar_saldo error: ", err)
+					log.Fatal("ConsultarSaldo error: ", err)
 				}
 			} else {
 				fmt.Println("Conta inexistente")
@@ -112,7 +101,7 @@ func main() {
 
 			fmt.Scanln(&conta.Numero)
 
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
+			err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
 			if err != nil {
 				log.Fatal("Conta error: ", err)
 			}
@@ -140,7 +129,7 @@ func main() {
 			fmt.Println("Informe o número da conta:")
 			fmt.Scanln(&conta.Numero)
 
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
+			err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
 			if err != nil {
 				log.Fatal("Conta error: ", err)
 			}
@@ -173,7 +162,7 @@ func main() {
 				log.Fatal("Autenticar error: ", err)
 			}
 			if reply2 == true {
-				err = c.Call("Conta.Fechar_conta", conta, &reply)
+				err = c.Call("Conta.FecharConta", conta, &reply)
 				if err != nil {
 					log.Fatal("Depositar error: ", err)
 				} else {
@@ -181,141 +170,150 @@ func main() {
 				}
 			}
 		case 7:
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
-			assinatura = reply3
-			if err != nil {
-				log.Fatal("Conta error: ", err)
-			}
-			conta.Assinatura = assinatura
-			if assinatura != 0 {
-
-				err = c.Call("Conta.Abrir_conta", conta, &reply)
-				if err != nil {
-					log.Fatal("Conta error: ", err)
-				}
-				fmt.Printf("Conta número: %d criada\n", reply.Numero)
-				fmt.Printf("Saldo da conta: %.2f\n", reply.Saldo)
-				reply.Saldo = 0
-
-				err = c.Call("Conta.Abrir_conta", conta, &reply)
-				if err != nil {
-					log.Fatal("Conta error: ", err)
-				}
-				if conta.Assinatura != -1 {
-					fmt.Printf("Conta: %d\n", reply.Numero)
-					fmt.Printf("Saldo: %.2f\n", reply.Saldo)
-					reply.Saldo = 0
-				}
-			}
-
+			simulaErroAbrirConta(c, err)
 		case 8:
-			fmt.Println("Informe o número da conta:")
-
-			fmt.Scanln(&conta.Numero)
-
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
-			assinatura = reply3
-			if err != nil {
-				log.Fatal("Conta error: ", err)
-			}
-			conta.Assinatura = assinatura
-			if assinatura != 0 {
-				err = c.Call("Conta.Autenticar", conta, &reply2)
-				if err != nil {
-					log.Fatal("Autenticar error: ", err)
-				}
-				if reply2 == true {
-					fmt.Println("Valor do saque:")
-					fmt.Scanln(&conta.Movimentacao)
-					err = c.Call("Conta.Sacar", conta, &reply)
-					if err != nil {
-						log.Fatal("Sacar error: ", err)
-					} else {
-						if conta.Assinatura != -1 {
-							fmt.Printf("Conta: %d\n", reply.Numero)
-							fmt.Printf("Saldo: %.2f\n", reply.Saldo)
-							reply.Saldo = 0
-						}
-
-					}
-				}
-
-				//segunda vez
-				fmt.Println("segunda tentativa:")
-				err = c.Call("Conta.Autenticar", conta, &reply2)
-				if err != nil {
-					log.Fatal("Autenticar error: ", err)
-				}
-				if reply2 == true {
-					err = c.Call("Conta.Sacar", conta, &reply)
-					if err != nil {
-						log.Fatal("Sacar error: ", err)
-					} else {
-						if conta.Assinatura != -1 {
-							fmt.Printf("Conta: %d\n", reply.Numero)
-							fmt.Printf("Saldo: %.2f\n", reply.Saldo)
-							reply.Saldo = 0
-						}
-					}
-				}
-			}
-
+			simulaErroSacar(c, err)
 		case 9:
-			fmt.Println("Informe o número da conta:")
-
-			fmt.Scanln(&conta.Numero)
-
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
-			assinatura = reply3
-			if err != nil {
-				log.Fatal("Conta error: ", err)
-			}
-			conta.Assinatura = assinatura
-			if assinatura != 0 {
-				err = c.Call("Conta.Autenticar", conta, &reply2)
-				if err != nil {
-					log.Fatal("Autenticar error: ", err)
-				}
-				if reply2 == true {
-					fmt.Println("Valor do deposito:")
-					fmt.Scanln(&conta.Movimentacao)
-					err = c.Call("Conta.Depositar", conta, &reply)
-					if err != nil {
-						log.Fatal("Depositar error: ", err)
-					} else {
-						if conta.Assinatura != -1 {
-							fmt.Printf("Conta: %d\n", reply.Numero)
-							fmt.Printf("Saldo: %.2f\n", reply.Saldo)
-							reply.Saldo = 0
-						}
-					}
-				}
-
-				//segunda tentativa
-				fmt.Println("Segunda tentativa")
-				err = c.Call("Conta.Autenticar", conta, &reply2)
-				if err != nil {
-					log.Fatal("Autenticar error: ", err)
-				}
-				if reply2 == true {
-					err = c.Call("Conta.Depositar", conta, &reply)
-					if err != nil {
-						log.Fatal("Depositar error: ", err)
-					} else {
-						if conta.Assinatura != -1 {
-							fmt.Printf("Conta: %d\n", reply.Numero)
-							fmt.Printf("Saldo: %.2f\n", reply.Saldo)
-							reply.Saldo = 0
-						}
-					}
-				}
-			}
-
+			simulaErroDepositar(c, err)
 		case 0:
-			fmt.Println("Tchau!!")
+			log.Fatal("Fechando")
 		default:
 			fmt.Println("Comando inválido!")
 		}
+
+		op = -1
+		fmt.Println("\n\n")
 	}
 
+}
+
+func printMenu() {
+	fmt.Println("Digite a operação desejada:")
+	fmt.Println("1 - Abrir Conta")
+	fmt.Println("2 - Consultar Saldo")
+	fmt.Println("3 - Autenticar Conta")
+	fmt.Println("4 - Sacar")
+	fmt.Println("5 - Depositar")
+	fmt.Println("6 - Fechar Conta")
+	fmt.Println("7 - Abrir conta com erro (teste)")
+	fmt.Println("8 - Sacar com erro (teste)")
+	fmt.Println("9 - Depositar com erro (teste)")
+	fmt.Println("0 - Sair")
+	fmt.Println("")
+}
+
+func simulaErroAbrirConta(c *rpc.Client, err error) {
+	err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
+	if err != nil {
+		log.Fatal("Conta error: ", err)
+	}
+	conta.Assinatura = reply3
+	if conta.Assinatura != 0 {
+		err = c.Call("Conta.AbrirContaErro", conta, &reply)
+		if err != nil {
+			log.Println("Erro na operação Abrir conta: ", err)
+			log.Println("Executando segunda tentativa")
+			err = c.Call("Conta.AbrirContaErro", conta, &reply)
+			if err != nil {
+				log.Println("Erro na operação Abrir conta: ", err)
+			}
+		} else {
+			fmt.Printf("Conta número: %d criada\n", reply.Numero)
+			fmt.Printf("Saldo da conta: %.2f\n", reply.Saldo)
+			fmt.Printf("Status da conta: %t\n", reply.Ativa)
+			reply.Saldo = 0
+		}
+	}
+}
+
+func simulaErroSacar(c *rpc.Client, err error) {
+	fmt.Println("Informe o número da conta:")
+	fmt.Scanln(&conta.Numero)
+	err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
+	assinatura = reply3
+	if err != nil {
+		log.Fatal("Erro na operação Gerar assinatura: ", err)
+	}
+	conta.Assinatura = assinatura
+	if assinatura != 0 {
+		err = c.Call("Conta.Autenticar", conta, &reply2)
+		if err != nil {
+			log.Fatal("Erro na operação Autenticar: ", err)
+		}
+		if reply2 == true {
+			fmt.Println("Valor do saque:")
+			fmt.Scanln(&conta.Movimentacao)
+			err = c.Call("Conta.SacarErro", conta, &reply)
+			if err != nil {
+				log.Println("Erro na operação Sacar: ", err)
+				log.Println("Executando segunda tentativa")
+				err = c.Call("Conta.Autenticar", conta, &reply2)
+				if err != nil {
+					log.Fatal("Erro na operação Autenticar: ", err)
+				}
+				if reply2 == true {
+					err = c.Call("Conta.SacarErro", conta, &reply)
+					if err != nil {
+						log.Println("Erro na operação Sacar: ", err)
+					} else {
+						if conta.Assinatura != -1 {
+							fmt.Printf("Conta: %d\nSaldo: %.2f\n", reply.Numero, reply.Saldo)
+							reply.Saldo = 0
+						}
+					}
+				}
+			} else {
+				if conta.Assinatura != -1 {
+					fmt.Printf("Conta: %d\nSaldo: %.2f\n", reply.Numero, reply.Saldo)
+					reply.Saldo = 0
+				}
+			}
+		}
+	}
+}
+
+func simulaErroDepositar(c *rpc.Client, err error) {
+	fmt.Println("Informe o número da conta:")
+	fmt.Scanln(&conta.Numero)
+	err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
+	assinatura = reply3
+	if err != nil {
+		log.Fatal("Erro na operação Gerar assinatura: ", err)
+	}
+	conta.Assinatura = assinatura
+	if assinatura != 0 {
+		err = c.Call("Conta.Autenticar", conta, &reply2)
+		if err != nil {
+			log.Fatal("Erro na operação Autenticar: ", err)
+		}
+		if reply2 == true {
+			fmt.Println("Valor do deposito:")
+			fmt.Scanln(&conta.Movimentacao)
+			err = c.Call("Conta.DepositarErro", conta, &reply)
+			if err != nil {
+				log.Println("Erro na operação Depositar: ", err)
+				log.Println("Executando segunda tentativa")
+				err = c.Call("Conta.Autenticar", conta, &reply2)
+				if err != nil {
+					log.Fatal("Erro na operação Autenticar: ", err)
+				}
+				if reply2 == true {
+					err = c.Call("Conta.Depositar", conta, &reply)
+					if err != nil {
+						log.Println("Erro na operação Depositar: ", err)
+					} else {
+						if conta.Assinatura != -1 {
+							fmt.Printf("Conta: %d\nSaldo: %.2f\n", reply.Numero, reply.Saldo)
+							reply.Saldo = 0
+						}
+					}
+				}
+			} else {
+				if conta.Assinatura != -1 {
+					fmt.Printf("Conta: %d\nSaldo: %.2f\n", reply.Numero, reply.Saldo)
+					reply.Saldo = 0
+				}
+			}
+		}
+	}
 }

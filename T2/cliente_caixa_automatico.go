@@ -44,7 +44,7 @@ func main() {
 			fmt.Println("Informe o número da conta:")
 			fmt.Scanln(&conta.Numero)
 
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
+			err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
 			if err != nil {
 				log.Fatal("Conta error: ", err)
 			}
@@ -73,7 +73,7 @@ func main() {
 
 			fmt.Scanln(&conta.Numero)
 
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
+			err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
 			if err != nil {
 				log.Fatal("Conta error: ", err)
 			}
@@ -108,12 +108,12 @@ func main() {
 				log.Fatal("Autenticar error: ", err)
 			}
 			if reply2 == true {
-				err = c.Call("Conta.Consultar_saldo", conta, &reply)
+				err = c.Call("Conta.ConsultarSaldo", conta, &reply)
 				fmt.Printf("Conta: %d\n", reply.Numero)
 				fmt.Printf("Saldo: %.2f\n", reply.Saldo)
 				reply.Saldo = 0
 				if err != nil {
-					log.Fatal("Consultar_saldo error: ", err)
+					log.Fatal("ConsultarSaldo error: ", err)
 				}
 			} else {
 				fmt.Println("Conta inexistente")
@@ -124,7 +124,7 @@ func main() {
 
 			fmt.Scanln(&conta.Numero)
 
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
+			err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
 			assinatura = reply3
 			if err != nil {
 				log.Fatal("Conta error: ", err)
@@ -175,7 +175,7 @@ func main() {
 
 			fmt.Scanln(&conta.Numero)
 
-			err = c.Call("Conta.Gerar_assinatura", assinatura, &reply3)
+			err = c.Call("Conta.GerarAssinatura", assinatura, &reply3)
 			assinatura = reply3
 			if err != nil {
 				log.Fatal("Conta error: ", err)
