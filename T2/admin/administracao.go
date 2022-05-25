@@ -41,7 +41,11 @@ func (c *Conta) GerarAssinatura(tmp int, reply *int) error {
 }
 
 func (c *Conta) AbrirConta(conta Conta, reply *Conta) error {
+	log.Println("Executando AbrirConta")
+	log.Println("Verificando Assinatura")
 	if conta.Assinatura == assinatura {
+		log.Println("Assinatura Verificada")
+		log.Println("Executando Transação")
 		gerador = gerador + 1
 		conta.Numero = gerador
 		conta.Saldo = 0
@@ -50,6 +54,7 @@ func (c *Conta) AbrirConta(conta Conta, reply *Conta) error {
 		database = append(database, conta)
 		assinatura = assinatura + 1
 		*reply = database[len(database)-1]
+		log.Println("Operação realizada com sucesso")
 		return nil
 	}
 	log.Printf("Erro ao Abrir conta: Assinatura inválida %d\n", assinatura)
